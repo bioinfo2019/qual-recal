@@ -942,7 +942,7 @@ int getFeatureVectors(std::vector<unsigned char>& readSequenceData, std::vector<
 			featureVector[PAIR_ORIENTATION] = 1.0;
 		if(hasFlagRC(record) && hasFlagNextRC(record)) // R1R2
 			featureVector[PAIR_ORIENTATION] = 2.0;
-		if(!hasFlagRC(record) && hasFlagNextRC(record)) // R1F2
+		if(hasFlagRC(record) && !hasFlagNextRC(record)) // R1F2
 			featureVector[PAIR_ORIENTATION] = 3.0;
 
 
