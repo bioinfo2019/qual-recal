@@ -1,2 +1,3 @@
-# qual-recal
-Recalibrating mapping quality scores
+This repository contains programs, scripts and data for investigating the effects of mapping-quality score calibration on variant detection in low-coverage, whole-genome DNA sequencing data.
+
+The resources in the repository allow for the simulation of diploid plant genomes implanted with variants such as SNP, INDEL and various structural variants. Simulated paried-end reads can be generated from these simulated genomes with the ART read simulation tool. Mapping the simulated reads with Bowtie2 back to their original reference genomes will create BAM files needed for the analysis pipeline described below.
