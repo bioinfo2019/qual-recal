@@ -15,7 +15,9 @@ https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cf
 Data needed to replicate the results in our paper include the tomato (S. lycopersicon) genome assembly version SL2.50, pepper (C. annuum) version 1.55 and rice (Oryza sativa L. ssp.indica) version ASM465v1:
 
 ftp://ftp.solgenomics.net/genomes/Solanum_lycopersicum/assembly/build_2.50/S_lycopersicum_chromosomes.2.50.fa.gz
+
 ftp://ftp.solgenomics.net/genomes/Capsicum_annuum/C.annuum_cvCM334/assemblies/Pepper.v.1.55.total.chr.gz
+
 https://www.ncbi.nlm.nih.gov/assembly/GCA_000004655.2/
 
 A VCF file containing the SNPs and INDELS used for simulating the tomato genome can be found here:
