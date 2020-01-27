@@ -6,12 +6,13 @@ The resources in the repository allow for the simulation of diploid plant genome
 
 **Software**
 
-The C++ folder in this repository contain scripts and programs to perform functions for extracting features from SAM (sequence/Alignment Map) files to use in training machine learning models to detect incorrectly aligned reads. The two files in the *bamlib* folder depend on the SeqAn sequence analysis C++ library.
+The C++ folder in this repository contain scripts and programs to perform functions for extracting features from SAM (sequence/Alignment Map) files to use in training machine learning models to detect incorrectly aligned reads. The two files in the *bamlib* subfolder depend on the SeqAn sequence analysis C++ library.
 
 https://www.seqan.de/
 
-Those two files should be compiled as a shared object library using the C++14 dialect. 
+Those two files should be compiled as a shared object library using the C++14 dialect. The files in the *recal* subfolder should be compiled as an application that links to the bamlib shared object. The *main* routine can be found in the file nrmap.cc.
 
+The programs in the Python folder train models, implement data sampling schemes and make predictions on unseen samples.
 
 Besides the resources here, a few external tools are needed. The VarSim diploid genome simulation package is available below:
 
