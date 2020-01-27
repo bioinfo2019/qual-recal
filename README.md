@@ -24,6 +24,8 @@ VarSim utilizes the ART Illumina read simulator. Get the latest version here:
 
 https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm
 
+**Data**
+
 Data needed to replicate the results in our paper include the tomato (S. lycopersicon) genome assembly version SL2.50, pepper (C. annuum) version 1.55 and rice (Oryza sativa L. ssp.indica) version ASM465v1:
 
 ftp://ftp.solgenomics.net/genomes/Solanum_lycopersicum/assembly/build_2.50/S_lycopersicum_chromosomes.2.50.fa.gz
