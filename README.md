@@ -24,7 +24,7 @@ A VCF file containing the SNPs and INDELS used for simulating the tomato genome 
 
 ftp://ftp.solgenomics.net/genomes/tomato_150/150_VCFs_2.50/RF_002_SZAXPI009284-57.vcf.gz.snpeff.vcf.gz
 
-VCF files containing the structural variants for tomato can be found in the SV folder., and VCF files containing SNPs and INDELs for rice and pepper are located in the VCF folder.
+VCF files containing the structural variants for tomato can be found in the SV folder, and VCF files containing SNPs and INDELs for rice and pepper are located in the VCF folder. VCF files for structural variants, SNPs and small INDELs were used as input to the VarSim program to created the simulated tomato genome.
 
 
 
