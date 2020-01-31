@@ -1,4 +1,4 @@
-**Recalibrating Probability Estimates Used to Compute Mapping Quality Scores**
+## Recalibrating Probability Estimates Used to Compute Mapping Quality Scores
 
 This repository contains programs, scripts and data for investigating the effects of mapping-quality score recalibration on variant detection in low-coverage, whole-genome DNA sequencing data.
 
@@ -54,5 +54,5 @@ There is a bash script, recal_bamfile.sh, that drives the process of
 * Calling SNPs
 * Collecting statistics
 
-
+Paths to data and programs can be set in the bash script.
 
