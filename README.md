@@ -58,3 +58,10 @@ Another bash script, *recal.sh*, handles
 
 Paths to data and programs can be set in the bash scripts.
 
+The *mapping.sh* script is run first. Then the Python program *ModelTraining.py* can be used to generate models for predicting bad reads and printing out statistics (average precsion, Brier score, F1 score, number of true/false positives, etc.)
+
+The Python program *ModelPredict.py* is used to predict misplaced reads using any of the models produced by *ModelTraining.py*. The program also outputs a very large Tab-delimited text file used as input to the program that produces the recalibrated BAM file.
+
+After running *ModelPredict.py*, the TAB-delimited text file is used with the *recal.sh* script to generate a recalibrated BAM file, call SNPs and compare the VCFs.
+
+The output of the VCF comparison is used with the *eval_snps.py* program to evaluate the performance of the recalibration procedure on SNP calling.
