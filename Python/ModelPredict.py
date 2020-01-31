@@ -34,6 +34,7 @@ from sklearn.model_selection import cross_val_predict
 from imblearn.under_sampling import TomekLinks
 from imblearn.metrics import geometric_mean_score
 
+# Set to be the same as the folder set in ModelTraining.py
 BASE_DIR = '/media/eliot/WD4TB/eliot_files/MyFiles/PhD'
 
 MAPQ = 3
