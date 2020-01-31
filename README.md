@@ -1,4 +1,4 @@
-# Recalibrating Probability Estimates Used to Compute Mapping Quality Scores
+## Recalibrating Probability Estimates Used to Compute Mapping Quality Scores
 
 This repository contains programs, scripts and data for investigating the effects of mapping-quality score recalibration on variant detection in low-coverage, whole-genome DNA sequencing data.
 
@@ -24,6 +24,7 @@ VarSim utilizes the ART Illumina read simulator. Get the latest version here:
 
 https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm
 
+Bowtie2 is used as theread mapper, and Samtool version 1.9 needs to be installed as well.
 
 **Data**
 
