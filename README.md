@@ -24,6 +24,7 @@ VarSim utilizes the ART Illumina read simulator. Get the latest version here:
 
 https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm
 
+
 **Data**
 
 Data needed to replicate the results in our paper include the tomato (S. lycopersicon) genome assembly version SL2.50, pepper (C. annuum) version 1.55 and rice (Oryza sativa L. ssp.indica) version ASM465v1:
@@ -38,7 +39,9 @@ A VCF file containing the SNPs and INDELS used for simulating the tomato genome 
 
 ftp://ftp.solgenomics.net/genomes/tomato_150/150_VCFs_2.50/RF_002_SZAXPI009284-57.vcf.gz.snpeff.vcf.gz
 
-VCF files containing the structural variants for tomato can be found in the SV folder, and VCF files containing SNPs and INDELs for rice and pepper are located in the VCF folder. VCF files for structural variants, SNPs and small INDELs were used as input to the VarSim program to created the simulated tomato genome.
+VCF files containing the structural variants for tomato can be found in the SV folder, and VCF files containing SNPs and INDELs for rice and pepper are located in the VCF folder. VCF files for structural variants, SNPs and small INDELs were used as input to the VarSim program to created the simulated tomato genome, while only SNPs and INDELs were used in the simulated genomes of pepper and rice.
+
+
 
 
 
