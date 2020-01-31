@@ -6,11 +6,15 @@ The resources in the repository allow for the simulation of diploid plant genome
 
 **Software**
 
+All software is run in Linux (Ubuntu 18.04). The pipeline here **IS NOT** a production-ready tool. These are scripts and programs written to answer a particular research question. Development of a high-performance version of these scripts and programs is underway.
+
 The C++ folder in this repository contain scripts and programs to perform functions for extracting features from SAM (sequence/Alignment Map) files to use in training machine learning models to detect incorrectly aligned reads. The two files in the *bamlib* subfolder depend on the SeqAn sequence analysis C++ library.
 
 https://www.seqan.de/
 
 Those two files should be compiled as a shared object library using the C++14 dialect. The files in the *recal* subfolder should be compiled as an application that links to the bamlib shared object. The *main* routine can be found in the file nrmap.cc.
+
+A GPU is used to compute the tens of millions of least squares lines and correlations of the base call quality scores vs. position in read. A CUDA compute level 6.1 GPU must exist with the CUDA libraries installed. 
 
 The programs in the Python folder train models, implement data sampling schemes and make predictions on unseen samples.
 
