@@ -44,15 +44,17 @@ VCF files containing the structural variants for tomato can be found in the SV f
 
 **Analysis Pipeline**
 
-There is a bash script, recal_bamfile.sh, that drives the process of 
+There is a bash script, *mapping.sh*, that drives the process of 
 
-* Simulating genomes
+* Simulating genomes and reads
 * Mapping reads
 * Extracting features
-* Training models
-* Predicting bad reads
-* Calling SNPs
-* Collecting statistics
 
-Paths to data and programs can be set in the bash script.
+Another bash script, *recal.sh*, handles
+
+* Generating a recalibrated BAM file
+* Calling SNPs with the original and recalibrated BAM files
+* Comparing the resulting VCF files
+
+Paths to data and programs can be set in the bash scripts.
 
