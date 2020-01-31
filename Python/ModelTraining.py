@@ -40,6 +40,7 @@ from imblearn.under_sampling import TomekLinks
 from imblearn.metrics import geometric_mean_score
 from imblearn.ensemble import BalancedBaggingClassifier, RUSBoostClassifier
 
+# Edit path to where you want models saved
 BASE_DIR = '/media/eliot/WD4TB/eliot_files/MyFiles/PhD'
 
 MAPQ = 3
@@ -512,14 +513,14 @@ feats_file = BASE_DIR + '/models/tom_all_feats.tab'
 #cols = [MAPQ,INSERT_SIZE,GAP_EXTENSIONS,EDIT_DISTANCE,MISMATCHES,GAP_OPENS,ALIGNMENT_SCORE,SECONDARY_ALIGNMENT_SCORE,PAIR_ORIENTATION,PAIR_ALIGNMENT_TYPE,INTERCEPT,SLOPE,N_LOW_QUAL_BASES,CLASS]
 cols = (SECONDARY_ALIGNMENT_SCORE,ALIGNMENT_SCORES_DIFF,ALIGNMENT_SCORE,MAPQ,MATE_ALIGNMENT_SCORE,MISMATCHES,EDIT_DISTANCE,CLASS)
 
-est_type = 'lr'
+est_type = 'RULR'
 n_subsets = 300
 
 ########################################################################
 
 
 # Set up possible values of parameters to optimize over
-if est_type == "lr":
+if est_type == "RULR" or est_type == "RULRS" :
     p_grid = {"C": [1, 10, 100, 1000]} #{"C": [1, 10, 100, 1000]}
     est = LogisticRegression(class_weight='balanced', solver='liblinear')
 else:
