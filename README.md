@@ -8,7 +8,7 @@ The resources in the repository allow for the simulation of diploid plant genome
 
 All software is run in Linux (Ubuntu 18.04). The pipeline here **IS NOT** a production-ready tool. These are scripts and programs written to answer a particular research question. Development of a high-performance version of these scripts and programs is underway.
 
-The C++ folder in this repository contain scripts and programs to perform functions for extracting features from SAM (sequence/Alignment Map) files to use in training machine learning models to detect incorrectly aligned reads. The two files in the *bamlib* subfolder depend on the SeqAn sequence analysis C++ library.
+The C++ folder in this repository contain programs to perform functions for extracting features from SAM (sequence/Alignment Map) files to use in training machine learning models to detect incorrectly aligned reads. The two files in the *bamlib* subfolder depend on the SeqAn sequence analysis C++ library.
 
 https://www.seqan.de/
 
@@ -28,7 +28,7 @@ VarSim utilizes the ART Illumina read simulator. Get the latest version here:
 
 https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm
 
-Bowtie2 is used as theread mapper, and Samtool version 1.9 needs to be installed as well.
+Bowtie2 is used as the read mapper, and Samtools version 1.9 needs to be installed as well.
 
 **Data**
 
