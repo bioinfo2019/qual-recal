@@ -1,6 +1,7 @@
 #!/bin/bash
 
-LD_LIBRARY_PATH=/home/eliot/Myfiles/PhD/workspace/bamlib/Release
+BASE_DIR=/media/eliot/WD4TB/eliot_files/MyFiles/PhD
+LD_LIBRARY_PATH=$BASE_DIR/workspace/bamlib/Release
 export LD_LIBRARY_PATH
 
 # general paramters
@@ -30,7 +31,6 @@ FEATURES_FILE=tomato_feats.tab
 
 ###################################################
 
-BASE_DIR=/media/eliot/WD4TB/eliot_files/MyFiles/PhD
 FREEBAYES_PATH=$BASE_DIR/misc_src/freebayes/bin
 ART_PATH=$BASE_DIR/varsim_run/ART/art_bin_MountRainier
 FASTA_REF=$BASE_DIR/varsim_run/reference/$FASTA_FILE
