@@ -79,7 +79,7 @@ Model training can take substantial amounts of time. Grid search is used to hype
 
 The scripts also expect a certain directory structure. The following directories should be created anywhere on the filesystem that is convenient.
 
-[dir.png](https://postimg.cc/gxsQ449W)
+![dir.png](https://postimg.cc/gxsQ449W)
 
 All Python scripts should be placed into the _PythonProgs_ folder. Bash scripts go in the _varsim\_run_ folder. Extracted features and trained models will be saved into the _models_ directory. VarSim and its utilities should be unpacked into the _varsim\_run_ folder. Use the latest version of ART, not the one supplied with VarSim, and unpack it into the _varsim\_run_ folder.
 
