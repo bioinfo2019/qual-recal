@@ -105,8 +105,8 @@ mv recal.vcf $BASE_DIR/varsim_run/variant_calls
 # COMPARE VCF FILES
 
 cd $BASE_DIR/varsim_run/variant_calls
-java -jar ../../VarSim.jar vcfcompare -true_vcf $VARSIM_PATH/out/$SAMPLE_ID.truth.vcf -prefix recal recal.vcf
-java -jar ../../VarSim.jar vcfcompare -true_vcf $VARSIM_PATH/out/$SAMPLE_ID.truth.vcf -prefix nocal nocal.vcf
+java -jar ../VarSim.jar vcfcompare -true_vcf $VARSIM_PATH/out/$SAMPLE_ID.truth.vcf -prefix recal recal.vcf
+java -jar ../VarSim.jar vcfcompare -true_vcf $VARSIM_PATH/out/$SAMPLE_ID.truth.vcf -prefix nocal nocal.vcf
 
 # GATHER STATISTICS
 
