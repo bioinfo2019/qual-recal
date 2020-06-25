@@ -126,7 +126,7 @@ do
 	echo "calling SNPs...."
 
 
-	cd $BASE_DIR/varsim_run/variant_calls/bcftools
+	cd $BASE_DIR/varsim_run/variant_calls
 
 	./call_snps.sh $BASE_DIR/varsim_run/alignments/$prefix.$f.bam $BASE_DIR/varsim_run/reference/$CUCFASTA nocal.vcf
 	./call_snps.sh $BASE_DIR/varsim_run/alignments/$prefix.$f.recal.bam $BASE_DIR/varsim_run/reference/$CUCFASTA recal.vcf
@@ -140,16 +140,16 @@ do
 	#cd $BASE_DIR/misc_src/freebayes/scripts
 
 	# ./freebayes-parallel <(./fasta_generate_regions.py $BASE_DIR/varsim_run/reference/$fasta.fai 1000000) 16 --use-mapping-quality \
-    # -f $BASE_DIR/varsim_run/reference/$fasta $BASE_DIR/varsim_run/alignments/cuc_subsampled/$prefix.$f.bam > $BASE_DIR/varsim_run/variant_calls/cuc_subsampled/CUC_nocal.vcf
+    # -f $BASE_DIR/varsim_run/reference/$fasta $BASE_DIR/varsim_run/alignments/$prefix.$f.bam > $BASE_DIR/varsim_run/variant_calls/cuc_subsampled/CUC_nocal.vcf
 	# ./freebayes-parallel <(./fasta_generate_regions.py $BASE_DIR/varsim_run/reference/$fasta.fai 1000000) 16 --use-mapping-quality \
-    # -f $BASE_DIR/varsim_run/reference/$fasta $BASE_DIR/varsim_run/alignments/cuc_subsampled/$prefix.$f.recal.bam > $BASE_DIR/varsim_run/variant_calls/cuc_subsampled/CUC_recal.vcf
+    # -f $BASE_DIR/varsim_run/reference/$fasta $BASE_DIR/varsim_run/alignments/$prefix.$f.recal.bam > $BASE_DIR/varsim_run/variant_calls/cuc_subsampled/CUC_recal.vcf
 
 	# VCF COMPARE
 
 	echo "comparing VCF files...."
 	cd $BASE_DIR/varsim_run/variant_calls
-	java -jar ../../VarSim.jar vcfcompare -true_vcf $BASE_DIR/varsim_run/input_vcfs/cuc_implant.vcf -prefix recal recal.vcf
-	java -jar ../../VarSim.jar vcfcompare -true_vcf $BASE_DIR/varsim_run/input_vcfs/cuc_implant.vcf -prefix nocal nocal.vcf
+	java -jar ../VarSim.jar vcfcompare -true_vcf $BASE_DIR/varsim_run/input_vcfs/cuc_implant.vcf -prefix recal recal.vcf
+	java -jar ../VarSim.jar vcfcompare -true_vcf $BASE_DIR/varsim_run/input_vcfs/cuc_implant.vcf -prefix nocal nocal.vcf
 
 	sed -i '/\t\t/d' recal_FP.vcf
 	sed -i '/\t\t/d' nocal_FP.vcf
