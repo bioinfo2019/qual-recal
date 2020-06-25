@@ -8,12 +8,19 @@ export LD_LIBRARY_PATH
 
 # Comment/uncomment these depending on which genome is being used
 
-## Tomato
+## Tomato - low variant density
 FASTA_FILE=S_lycopersicum_chromosomes.2.50.fa
 SNPS_VCF=RF_002_SZAXPI009284-57.vcf.gz.snpeff.vcf
 SAMPLE_ID=AILSACRAIG
 BT2_REF=tomato_sl2.50
 FEATURES_FILE=tomato_feats.tab
+
+## Tomato - high variant density
+#FASTA_FILE=S_lycopersicum_chromosomes.2.50.fa
+#SNPS_VCF=RF_037_SZAXPI008747-46.vcf.gz.snpeff.vcf
+#SAMPLE_ID=AILSACRAIG
+#BT2_REF=tomato_sl2.50
+#FEATURES_FILE=tomato_feats.tab
 
 ## Pepper
 #FASTA_FILE=korean_pepper_genome.fa
