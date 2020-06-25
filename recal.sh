@@ -1,6 +1,10 @@
 #!/bin/bash
 
-LD_LIBRARY_PATH=/home/eliot/Myfiles/PhD/workspace/bamlib/Release
+# Edit this variable to suit your system
+
+BASE_DIR=/your/top/level/path
+
+LD_LIBRARY_PATH=$BASE_DIR/misc/bamlib
 export LD_LIBRARY_PATH
 
 # general paramters
@@ -30,7 +34,6 @@ FEATURES_FILE=tomato_feats.tab
 
 ###################################################
 
-BASE_DIR=/media/eliot/WD4TB/eliot_files/MyFiles/PhD
 FREEBAYES_PATH=$BASE_DIR/misc_src/freebayes/bin
 ART_PATH=$BASE_DIR/varsim_run/ART/art_bin_MountRainier
 FASTA_REF=$BASE_DIR/varsim_run/reference/$FASTA_FILE
@@ -61,9 +64,8 @@ BWOUTFILE=$VARSIM_PATH/alignments/$SAMPLE_ID.bam
 
 # nrmap options
 
-NRMAP_PATH=/home/eliot/cuda-workspace/cuNRmap/Release
+NRMAP_PATH=$BASE_DIR/misc/nrmap
 NRMAP_INBAM=$BWOUTFILE
-NRMAP_SAMPLEDBAM=$SAMPLE_ID.sampled.bam
 NRMAP_RECALBAM=$SAMPLE_ID.recal.bam
 NRMAP_SCORESFILE=$BASE_DIR/models/10_scores.tab # Not used for anything now, but needs to be left in
 
@@ -72,19 +74,41 @@ FULL_FEATS_FILE=$VARSIM_PATH/$FEATURES_FILE
 
 ############# DO NOT CHANGE ANYTHING BELOW THIS LINE!##################
 
-# recalibrate full bam file
-$NRMAP_PATH/cuNRmap -c recal -b $NRMAP_INBAM -o $TMP_DIR/$NRMAP_RECALBAM -f $FASTA_REF -s /media/eliot/WD4TB/eliot_files/MyFiles/PhD/models/tom_recal_scores.tab -d $NRMAP_INBAM -l $READ_LENGTH
-
+# recalibrate bam file
+$NRMAP_PATH/nrmap recalbam --bamfilein $NRMAP_INBAM --bamfileout $TMP_DIR/$NRMAP_RECALBAM --qualsfile $BASE_DIR/models/$PREFIX.scores.tab
+  
 samtools sort -o $VARSIM_PATH/alignments/$NRMAP_RECALBAM -O bam -@ 12 $TMP_DIR/$NRMAP_RECALBAM
 rm $TMP_DIR/$NRMAP_RECALBAM
 samtools index $VARSIM_PATH/alignments/$NRMAP_RECALBAM
 
-
 #################################### Call and compare SNPs #################################################
 
+cd $BASE_DIR/varsim_run
 
-$FREEBAYES_PATH/freebayes -f $FASTA_REF -b $VARSIM_PATH/alignments/$NRMAP_RECALBAM -v $VARSIM_PATH/variant_calls/recal.vcf --use-mapping-quality
-$FREEBAYES_PATH/freebayes -f $FASTA_REF -b $NRMAP_INBAM -v $VARSIM_PATH/variant_calls/norecal.vcf --use-mapping-quality
+# SNP CALLING WITH BCFTOOLS
 
-java -jar $VARSIM_PATH/VarSim.jar vcfcompare -true_vcf $VARSIM_PATH/out/$SAMPLE_ID.truth.vcf -prefix $SAMPLE_ID.recal $VARSIM_PATH/variant_calls/pepper_recal.vcf
-java -jar $VARSIM_PATH/VarSim.jar vcfcompare -true_vcf $VARSIM_PATH/out/$SAMPLE_ID.truth.vcf -prefix $SAMPLE_ID.norecal $VARSIM_PATH/variant_calls/pepper_norecal.vcf 
+./call_snps.sh $NRMAP_INBAM $FASTA_REF nocal.vcf
+./call_snps.sh $VARSIM_PATH/alignments/$NRMAP_RECALBAM $FASTA_REF recal.vcf
+
+mv nocal.vcf $BASE_DIR/varsim_run/variant_calls
+mv recal.vcf $BASE_DIR/varsim_run/variant_calls
+
+# SNP CALLING WITH FREEBAYES
+
+#cd $BASE_DIR/misc_src/freebayes/scripts
+
+# ./freebayes-parallel <(./fasta_generate_regions.py $FASTA_REF.fai 1000000) 16 --use-mapping-quality \
+# -f $FASTA_REF $NRMAP_INBAM > $BASE_DIR/varsim_run/variant_calls/nocal.vcf
+# ./freebayes-parallel <(./fasta_generate_regions.py $FASTA_REF.fai 1000000) 16 --use-mapping-quality \
+# -f $FASTA_REF $VARSIM_PATH/alignments/$NRMAP_RECALBAM > $BASE_DIR/varsim_run/variant_calls/recal.vcf
+
+# COMPARE VCF FILES
+
+cd $BASE_DIR/varsim_run/variant_calls
+java -jar ../../VarSim.jar vcfcompare -true_vcf $VARSIM_PATH/out/$SAMPLE_ID.truth.vcf -prefix recal recal.vcf
+java -jar ../../VarSim.jar vcfcompare -true_vcf $VARSIM_PATH/out/$SAMPLE_ID.truth.vcf -prefix nocal nocal.vcf
+
+# GATHER STATISTICS
+
+cd $BASE_DIR/PythonProgs
+./snp_stats.py --base-dir $BASE_DIR
