@@ -1,7 +1,9 @@
 #!/bin/bash
 
-BASE_DIR=/media/eliot/WD4TB/eliot_files/MyFiles/PhD
-LD_LIBRARY_PATH=$BASE_DIR/workspace/bamlib/Release
+# Edit this path to suit your system
+BASE_DIR=/your/top/level/path
+
+LD_LIBRARY_PATH=$BASE_DIR/misc/bamlib
 export LD_LIBRARY_PATH
 
 # general paramters
@@ -43,7 +45,7 @@ ART_PATH=$BASE_DIR/varsim_run/ART/art_bin_MountRainier
 FASTA_REF=$BASE_DIR/varsim_run/reference/$FASTA_FILE
 
 VARSIM_PATH=$BASE_DIR/varsim_run
-TMP_DIR=/home/eliot  # Any folder on a separate hard disk to minimize IO to a single disk
+TMP_DIR=/tmp  # Any folder on a separate hard disk to minimize IO to a single disk
 PYTHON_SCRIPTS_PATH=$BASE_DIR/PythonProgs
 
 
@@ -57,7 +59,7 @@ READ_LENGTH=100
 TOTAL_COVERAGE=3
 SEQUENCER="HS20"
 MEAN_FRAG_SIZE=400
-SD_FRAG_SIZE=30
+SD_FRAG_SIZE=100
 ART_REF=$VARSIM_PATH/out/$SAMPLE_ID.fa
 ART_OPTIONS="'-nf 1 -ss $SEQUENCER -sp'"
 
@@ -68,9 +70,9 @@ BWOUTFILE=$VARSIM_PATH/alignments/$SAMPLE_ID.bam
 
 # nrmap options
 
-NRMAP_PATH=/home/eliot/cuda-workspace/cuNRmap/Release
+NRMAP_PATH=$BASEDIR/misc/nrmap
 NRMAP_INBAM=$BWOUTFILE
-NRMAP_SAMPLEDBAM=$SAMPLE_ID.sampled.bam
+NRMAP_OUTBAM=$SAMPLE_ID.sampled.bam
 NRMAP_RECALBAM=$SAMPLE_ID.recal.bam
 NRMAP_SCORESFILE=$BASE_DIR/models/10_scores.tab # Not used for anything now, but needs to be left in
 
@@ -81,7 +83,7 @@ FULL_FEATS_FILE=$VARSIM_PATH/$FEATURES_FILE
 ############# DO NOT CHANGE ANYTHING BELOW THIS LINE!##################
 
 
-VARSIM="./varsim.py --reference $FASTA_REF --id $SAMPLE_ID --read_length $READ_LENGTH --mean_fragment_size 240 --sd_fragment_size 120 --nlanes 1 --total_coverage $TOTAL_COVERAGE --simulator_executable $ART_PATH/art_illumina --art_options $ART_OPTIONS --out_dir out --log_dir log --work_dir work --simulator art  --vcfs $SNPS_VCF --disable_rand_vcf --disable_rand_dgv"
+VARSIM="./varsim.py --reference $FASTA_REF --id $SAMPLE_ID --read_length $READ_LENGTH --mean_fragment_size $MEAN_FRAG_SIZE --sd_fragment_size $SD_FRAG_SIZE --nlanes 1 --total_coverage $TOTAL_COVERAGE --simulator_executable $ART_PATH/art_illumina --art_options $ART_OPTIONS --out_dir out --log_dir log --work_dir work --simulator art  --vcfs $SNPS_VCF --disable_rand_vcf --disable_rand_dgv"
 
 eval $VARSIM
 
@@ -91,6 +93,5 @@ samtools sort -o $BWOUTFILE -O bam -@ 40 $TMP_DIR/tmp.bam
 rm $TMP_DIR/tmp.bam
 samtools index $BWOUTFILE
 
-# extract features from full bam file
-$NRMAP_PATH/cuNRmap -c extractfeats -b $NRMAP_INBAM -o $NRMAP_SAMPLEDBAM -f $FASTA_REF -s $NRMAP_SCORESFILE -d $NRMAP_INBAM -l $READ_LENGTH > $FULL_FEATS_FILE
-
+# extract features from bam file
+$NRMAP_PATH/nrmap extractfeats --bamfilein $NRMAP_INBAM --readlength $READ_LENGTH --fastafile $FASTA_REF --mapper BT2 --writeclass 1 > $FULL_FEATS_FILE
