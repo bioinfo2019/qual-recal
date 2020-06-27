@@ -131,6 +131,8 @@ _ModelTraining.py_ is used to train ML and isotonic regression models. They are 
 
 The list of models that can be trained and features that can be specified available in the _mapping.sh_ bash script.
 
+_ModelTraining.py_ should be run before either _mapping.sh_ or _recal.sh_.
+
 _ModelPredict.py_ is called by the bash script recal.sh. It has the same parameters as _ModelTraining.py_. _ModelPredict.py_ predicts misaligned reads from features extracted from the BAM alignment files and writes out a simple CSV file with each row containing a read name and an updated MAPQ score. This is used by the C++ program, _nrmap_, to create a new BAM file with the update MAPQ scores.
 
 The Python script _snp\_stats.py_ prints to screen and writes out to a CSV files the raw true/false positive totals, precision and recall for SNP calls made before and after MAPQ score recalibration. It also outputs the percentage change in both precision and recall after recalibration. It takes only one command line parameter:
