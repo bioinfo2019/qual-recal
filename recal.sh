@@ -55,7 +55,6 @@ VARSIM_PATH=$BASE_DIR/varsim_run
 TMP_DIR=/home/eliot  # Any folder on a separate hard disk to minimize IO to a single disk
 PYTHON_SCRIPTS_PATH=$BASE_DIR/PythonProgs
 
-
 # vcf2diploid options
 SV_VCF=$VARSIM_PATH/input_vcfs/ril_sv.vcf
 SNPS_VCF=$VARSIM_PATH/input_vcfs/$SNPS_VCF
@@ -66,7 +65,7 @@ READ_LENGTH=100
 TOTAL_COVERAGE=3
 SEQUENCER="HS20"
 MEAN_FRAG_SIZE=400
-SD_FRAG_SIZE=30
+SD_FRAG_SIZE=100
 ART_REF=$VARSIM_PATH/out/$SAMPLE_ID.fa
 ART_OPTIONS="'-nf 1 -ss $SEQUENCER -sp'"
 
