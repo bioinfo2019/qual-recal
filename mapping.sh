@@ -86,10 +86,8 @@ NRMAP_PATH=$BASEDIR/misc/nrmap
 NRMAP_INBAM=$BWOUTFILE
 NRMAP_OUTBAM=$SAMPLE_ID.sampled.bam
 NRMAP_RECALBAM=$SAMPLE_ID.recal.bam
-NRMAP_SCORESFILE=$BASE_DIR/models/10_scores.tab # Not used for anything now, but needs to be left in
 
-SAMPLED_FEATS_FILE=$BASE_DIR/tomato_sampled_feats.tab
-FULL_FEATS_FILE=$VARSIM_PATH/$FEATURES_FILE
+FEATS_FILE=$VARSIM_PATH/$FEATURES_FILE
 
 
 ############# DO NOT CHANGE ANYTHING BELOW THIS LINE!##################
