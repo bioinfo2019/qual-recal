@@ -1,80 +1,70 @@
 #!/home/eliot/anaconda2/bin/python
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Oct  6 18:34:04 2018
 
-@author: eliot
-"""
-import sys
+import argparse
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.externals import joblib
-import itertools
+import joblib
 import math
-from sklearn import metrics
+import xgboost as xgb
 
 from collections import Counter
-from sklearn.kernel_approximation import Nystroem
-from sklearn.model_selection import StratifiedKFold
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import ensemble
 from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC, LinearSVC
+from sklearn.svm import SVC
 from sklearn import preprocessing
-from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import confusion_matrix
 from sklearn.isotonic import IsotonicRegression as IR
 from sklearn.metrics import brier_score_loss, f1_score
-from sklearn.metrics import roc_curve
 from sklearn.metrics import recall_score, precision_score
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.utils import check_random_state, safe_indexing
-from sklearn.calibration import CalibratedClassifierCV, calibration_curve
+from sklearn.calibration import calibration_curve
 from sklearn.metrics import average_precision_score
+from sklearn.neighbors import KNeighborsClassifier
 
+from imblearn.ensemble import EasyEnsembleClassifier
 #from sklearn.externals.six import string_types
-from sklearn.model_selection import cross_val_predict
 from imblearn.under_sampling import TomekLinks
 from imblearn.metrics import geometric_mean_score
 from imblearn.ensemble import BalancedBaggingClassifier, RUSBoostClassifier
 
-# Edit path to where you want models saved
-BASE_DIR = '/media/eliot/WD4TB/eliot_files/MyFiles/PhD'
 
-MAPQ = 3
-INSERT_SIZE = 4
-GAP_EXTENSIONS = 5
-EDIT_DISTANCE = 6
-MISMATCHES = 7
-GAP_OPENS = 8
-ALIGNMENT_SCORE = 9
-SECONDARY_ALIGNMENT_SCORE = 10
-READ_COMPLEXITY_SCORE = 11
-READ_GC_CONTENT = 12
-PAIR_ORIENTATION = 13
-PAIR_ALIGNMENT_TYPE = 14
-INTERCEPT = 15
-SLOPE = 16
-R_VALUE = 17
-DEPTH = 18
-READ_EIGENVAL_1 = 19
-READ_EIGENVAL_2 = 20
-READ_TRACE = 21
-READ_DET = 22
-REF_EIGENVAL_1 = 23
-REF_EIGENVAL_2 = 24
-REF_TRACE = 25
-REF_DET = 26
-REF_COMPLEXITY_SCORE = 27
-REF_GC_CONTENT = 28
-N_LOW_QUAL_BASES = 29
-AVG_LOW_QUAL_BASE_SCORE = 30
-MATE_ALIGNMENT_SCORE = 31
-ALIGNMENT_SCORES_DIFF = 32
-CLASS = 33
-
+feats = {'MAPQ':3,
+        'INSERT_SIZE':4,
+        'GAP_EXTENSIONS':5,
+        'EDIT_DISTANCE':6,
+        'MISMATCHES':7,
+        'GAP_OPENS':8,
+        'ALIGNMENT_SCORE':9,
+        'SECONDARY_ALIGNMENT_SCORE':10,
+        'READ_COMPLEXITY_SCORE':11,
+        'READ_GC_CONTENT':12,
+        'PAIR_ORIENTATION':13,
+        'PAIR_ALIGNMENT_TYPE':14,
+        'INTERCEPT':15,
+        'SLOPE':16,
+        'R_VALUE':17,
+        'DEPTH':18,
+        'READ_EIGENVAL_1':19,
+        'READ_EIGENVAL_2':20,
+        'READ_TRACE':21,
+        'READ_DET':22,
+        'REF_EIGENVAL_1':23,
+        'REF_EIGENVAL_2':24,
+        'REF_TRACE':25,
+        'REF_DET':26,
+        'REF_COMPLEXITY_SCORE':27,
+        'REF_GC_CONTENT':28,
+        'N_LOW_QUAL_BASES':29,
+        'AVG_LOW_QUAL_BASE_SCORE':30,
+        'MATE_ALIGNMENT_SCORE':31,
+        'ALIGNMENT_SCORES_DIFF':32,
+        'CLASS':33}
 
 def invert_phred(mapq):
     
@@ -140,8 +130,6 @@ def plot_calibration_curve(name, name2, name3, y, y2, y3, prob, prob2, prob3, fi
     plt.tight_layout()
     
 
-
-
 def predict_tp_fp(X, y, prob):
     
     pred_pos_idxs = prob > 0.5
@@ -159,7 +147,7 @@ def predict_tp_fp(X, y, prob):
 
     pred_train = model.predict(X[pred_pos_idxs])
     
-    print confusion_matrix(y[pred_pos_idxs], pred_train)
+    print (confusion_matrix(y[pred_pos_idxs], pred_train))
     
     return model.predict_proba(X[pred_pos_idxs])[:,1], pred_pos_idxs
     
@@ -300,7 +288,7 @@ def fit(estimator, n_max_subset, X, y, random_state=None, return_indices=True, u
         
         y_subset = safe_indexing(y, subset_indices)
         
-        grid_search = GridSearchCV(estimator, param_grid=parameter_grid, cv=5, scoring='f1_weighted', n_jobs=24)
+        grid_search = GridSearchCV(estimator, param_grid=parameter_grid, cv=2, scoring='f1_weighted', n_jobs=8)
         grid_search.fit(X_subset, y_subset)
         model = grid_search.best_estimator_.fit(X_subset, y_subset)                
         
@@ -339,10 +327,10 @@ def fit(estimator, n_max_subset, X, y, random_state=None, return_indices=True, u
             X_new = np.concatenate((X_fn, X_tn, X_fp, X_tp))
             y_new = np.concatenate((y_fn, y_tn, y_fp, y_tp))
                        
-            LogisticRegression(class_weight='balanced', solver='liblinear')
+            #LogisticRegression(class_weight='balanced', solver='liblinear')
     
-            #est = SVC(kernel='rbf', class_weight='balanced', gamma='scale')
-            grid_search = GridSearchCV(est, param_grid=parameter_grid, cv=5, scoring='f1_weighted', n_jobs=24)
+            est = SVC(kernel='rbf', class_weight='balanced', gamma='scale')
+            grid_search = GridSearchCV(est, param_grid=parameter_grid, cv=2, scoring='f1_weighted', n_jobs=8)
             grid_search.fit(X_new, y_new)
             model = grid_search.best_estimator_.fit(X_new, y_new)
             feature_counts.append((n_fp, n_tp))
@@ -365,9 +353,7 @@ def fit(estimator, n_max_subset, X, y, random_state=None, return_indices=True, u
         #pred = cross_val_predict(estimator, X_subset, y_subset)
         # extract the prediction about the targeted classes only
         pred_target = pred[:index_under_sample.size]
-        index_classified = index_under_sample[
-            pred_target == safe_indexing(y_subset,
-                                         range(index_under_sample.size))]
+        index_classified = index_under_sample[pred_target == safe_indexing(y_subset, range(index_under_sample.size))]
         #print np.unique(y_subset)
         #print pred_target.size
         
@@ -489,53 +475,181 @@ def run_balanced_bagging(X, y):
                   "base_estimator__max_features":[2, 3]
                   }
 
-
-    dt = DecisionTreeClassifier()
-    bc = BalancedBaggingClassifier(base_estimator=dt, oob_score=False, random_state=None) #n_estimators=70, random_state=1)
+    est = SVC(kernel="linear", class_weight='balanced', C=100)
+    
+    #dt = DecisionTreeClassifier()
+    bc = BalancedBaggingClassifier(base_estimator=est, oob_score=True, random_state=None, n_estimators=1)
 
     # Grid Search to determine best parameters
-    grid_search = GridSearchCV(estimator=bc, param_grid=params, scoring='f1_weighted', cv=5, n_jobs=8)
+    #grid_search = GridSearchCV(estimator=bc, param_grid=params, scoring='f1_weighted', cv=3, n_jobs=8)
+
+    #grid_search.fit(X, y)
+    model = bc.fit(X,y) #grid_search.best_estimator_.fit(X, y)
+    
+    #n_pos = np.count_nonzero(bc.classes_)
+    #n_neg = len(bc.classes_) - n_pos
+    
+    return model, (1,1)
+
+def run_adaboost(X, y):
+
+    dt_stump = DecisionTreeClassifier(max_depth=1, min_samples_leaf=1)
+
+    ada_real = AdaBoostClassifier(base_estimator=dt_stump, algorithm="SAMME.R")
+    
+    p_grid = {"n_estimators":[50, 100, 200, 500], "learning_rate":[1, 0.1, 0.01, 0.001]}
+    p_grid = {"n_estimators":[1000, 2000, 2500], "learning_rate":[1, 0.1]}
+    
+    grid_search = GridSearchCV(ada_real, param_grid=p_grid, cv=5, n_jobs=5, scoring='f1_weighted')
+    grid_search.fit(X, y)
+    model = grid_search.best_estimator_ # sample_weight=samp_weights)
+
+    #model = AdaBoostClassifier(algorithm='SAMME.R',
+              #base_estimator=DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=1,
+                #max_features=None, max_leaf_nodes=None,
+                #min_impurity_decrease=0.0, min_impurity_split=None,
+                #min_samples_leaf=1, min_samples_split=2,
+                #min_weight_fraction_leaf=0.0, random_state=None,
+                #splitter='best'),
+              #learning_rate=1, n_estimators=2500, random_state=None)
+              
+    #n_pos = np.count_nonzero(model.classes_)
+    #n_neg = len(model.classes_) - n_pos
+    
+    return model.fit(X, y), (1, 1)
+
+
+def run_svm(X, y):
+    
+    
+    p_grid = {'C': [1.0, 10, 100, 1000]}
+    est = SVC(kernel="linear")
+
+    # Grid Search to determine best parameters
+    grid_search = GridSearchCV(estimator=est, param_grid=p_grid, scoring='f1_weighted', cv=5, n_jobs=8)
 
     grid_search.fit(X, y)
     model = grid_search.best_estimator_.fit(X, y)
+
+    n_pos = np.count_nonzero(model.classes_)
+    n_neg = len(model.classes_) - n_pos
     
-    n_pos = np.count_nonzero(bc.classes_)
-    n_neg = len(bc.classes_) - n_pos
     
     return model, (n_neg, n_pos)
-        
+
+
+def run_knn(X, y):
+    
+    
+    p_grid = {'n_neighbors': [5, 7, 10 ,15], 'weights': ['uniform', 'distance']}
+    est = KNeighborsClassifier()
+
+    # Grid Search to determine best parameters
+    grid_search = GridSearchCV(estimator=est, param_grid=p_grid, scoring='f1_weighted', cv=5, n_jobs=8)
+
+    grid_search.fit(X, y)
+    model = grid_search.best_estimator_.fit(X, y)
+
+    n_pos = np.count_nonzero(model.classes_)
+    n_neg = len(model.classes_) - n_pos
+    
+    
+    return model, (n_neg, n_pos)
+
+def run_easyensemble(X, y):
+    
+
+    p_grid = {"warm_start":[True, False], "base_estimator__n_estimators":[750, 1000, 2000, 3000], "base_estimator__learning_rate":[1, 0.1, 0.01], "sampling_strategy":[0.025, 0.05, 0.1, 0.25]}
+    dt_stump = DecisionTreeClassifier(max_depth=1)
+    ada_real = AdaBoostClassifier(base_estimator=dt_stump, algorithm="SAMME.R")
+    eec = EasyEnsembleClassifier(base_estimator=ada_real, random_state=42, n_jobs=8)
+    
+    grid_search = GridSearchCV(eec, param_grid=p_grid, cv=5, n_jobs=5, scoring='f1_weighted')
+    grid_search.fit(X, y)
+    model = grid_search.best_estimator_.fit(X, y) # sample_weight=samp_weights)
+
+    n_pos = np.count_nonzero(model.classes_)
+    n_neg = len(model.classes_) - n_pos
+    
+    return model, (n_pos, n_neg)
+
+def run_xgboost(X, y):
+    
+    parameters =    {
+                'max_depth': [3, 4, 5],
+                'learning_rate': [0.1, 0.2, 0.3],
+                'n_estimators': [50, 100, 150],
+                'gamma': [0, 0.1, 0.2],
+                'min_child_weight': [0, 0.5, 1],
+                'max_delta_step': [0],
+                'subsample': [0.7, 0.8, 0.9, 1],
+                'colsample_bytree': [0.6, 0.8, 1],
+                'colsample_bylevel': [1],
+                'reg_alpha': [0, 1e-2, 1, 1e1],
+                'reg_lambda': [0, 1e-2, 1, 1e1],
+                'base_score': [0.5],
+                'scale_pos_weight':[100.0]
+                }
+    
+    xgb_model = xgb.XGBClassifier(silent = True, random_state = 22)
+    
+    clf = RandomizedSearchCV(xgb_model, parameters, random_state=22, n_iter=1000, cv=5, verbose=0, n_jobs=-1)
+
+   # clf = GridSearchCV(xgb_model, parameters, scoring = 'f1_weighted', n_jobs = -1, cv = 5)
+    
+    clf.fit(X, y)
+    
+    model = clf.best_estimator_
+    
+
+    return model, (1, 1)
+
+
+################## Parse command line args #############################
+    
+parser = argparse.ArgumentParser(description='Train model and write it to disk')
+
+parser.add_argument('-b','--base-dir', help='Top level folder containing scripts and data', required=True)
+parser.add_argument('-m','--ml-model', help='Type of model to train', required=True)
+parser.add_argument('-f','--features', help='Comma separated list of features to be used for training', required=True)
+parser.add_argument('-v','--feats-file', help='TSV file containing feature vectors for training', required=True)
+
+args = parser.parse_args()
+
+BASE_DIR = args.base_dir
+est_type = args.ml_model
+feats_file = BASE_DIR + '/models/' + args.feats_file
+feature_list = args.features
+
+cols = tuple([feats[key] for key in feature_list.split(',')])
+
+
 ################## Run Parameters ######################################
 
 n_cores = 8
-
-feats_file = BASE_DIR + '/models/tom_all_feats.tab'
-
-#cols = [MAPQ,INSERT_SIZE,GAP_EXTENSIONS,EDIT_DISTANCE,MISMATCHES,GAP_OPENS,ALIGNMENT_SCORE,SECONDARY_ALIGNMENT_SCORE,PAIR_ORIENTATION,PAIR_ALIGNMENT_TYPE,INTERCEPT,SLOPE,N_LOW_QUAL_BASES,CLASS]
-cols = (SECONDARY_ALIGNMENT_SCORE,ALIGNMENT_SCORES_DIFF,ALIGNMENT_SCORE,MAPQ,MATE_ALIGNMENT_SCORE,MISMATCHES,EDIT_DISTANCE,CLASS)
-
-est_type = 'RULR'
 n_subsets = 300
 
 ########################################################################
 
 
 # Set up possible values of parameters to optimize over
-if est_type == "RULR" or est_type == "RULRS" :
+if est_type == "RULR" or est_type == "RULRS":
     p_grid = {"C": [1, 10, 100, 1000]} #{"C": [1, 10, 100, 1000]}
     est = LogisticRegression(class_weight='balanced', solver='liblinear')
 else:
-    p_grid = {'C': [0.001, 0.1, 1.0, 10]}
+    p_grid = {'C': [1, 10, 100, 1000]}
     est = SVC(kernel="rbf", class_weight='balanced', gamma='scale')
 
 
-print "loading data file...."
+print("loading data file....")
 
-dataset = pd.read_csv(feats_file, usecols=cols, delimiter="\t").values
+d = pd.read_csv(feats_file, usecols=cols, delimiter="\t")
+dataset = d.values
 read_names = pd.read_csv(feats_file, usecols=(0,), delimiter="\t").values
 
-print "done\n"        
+print ("done\n")
 
-last_col = len(cols) - 1
+last_col = len(d.columns) - 1
 X = dataset[:,0:last_col]
 y = dataset[:,last_col]
 y = y.astype(int)
@@ -544,15 +658,15 @@ mapqs = X[:, 0]
 ir = IR( out_of_bounds = 'clip' )
 
 
-print "scaling input data...."
+print("scaling input data....")
 min_max_scaler = preprocessing.MinMaxScaler()
 Xs = min_max_scaler.fit_transform(X)
-print "done\n"
+print ("done\n")
 
+print("splitting input into training and test sets....")
+X_train, X_test, y_train, y_test = train_test_split(Xs, y, random_state=None, stratify=y, test_size=0.8, train_size=0.2)
+print("done\n")
 
-print "splitting input into training and test sets...."
-X_train, X_test, y_train, y_test = train_test_split(Xs, y, random_state=0, stratify=y, test_size=0.8, train_size=0.2)
-print "done\n"
 
 if est_type == 'RULRS' or est_type == 'RUSVMS':
     X_res, y_res, idxs, model, sample_counts = fit(est, n_subsets, X_train, y_train, random_state=None, under_sampling_factor=1, parameter_grid=p_grid, refit=True)
@@ -562,16 +676,18 @@ elif est_type == 'DTBG':
     model, sample_counts = run_balanced_bagging(X_train, y_train)
 elif est_type == 'RUBST':
     model, sample_counts = run_ru_boost(X_train, y_train)
-    
+elif est_type == 'ADB':
+    model, sample_counts = run_adaboost(X_train, y_train)
+elif est_type == 'XGB':
+    model, sample_counts = run_xgboost(X_train, y_train)
 #################################################################
 
 
 joblib.dump(model, BASE_DIR + '/models/' + est_type + '.pkl')
 
+print ("calibrating probabilities....")
 
-print "calibrating probabilities...."
-
-if est_type != 'svm':
+if est_type != 'RUSVMS' and  est_type != 'RUSVM':
     train_proba = model.predict_proba(X_train)[:,1]
     test_proba = model.predict_proba(X_test)
     isr_fit = ir.fit(train_proba, y_train)
@@ -585,7 +701,7 @@ else:
     train_proba = ir.transform(train_distance)
     test_proba = p_cal
 
-print "done"
+print ("done")
 
 
 joblib.dump(isr_fit, BASE_DIR + '/models/' + est_type + '_ISO.pkl')
@@ -599,10 +715,10 @@ FN = cm_train_preds[1,0]
 TP = cm_train_preds[1,1]
 FP = cm_train_preds[0,1]
 
-print "CM training set preds:"
-print cm_train_preds
+print ("CM training set preds:")
+print (cm_train_preds)
 
-print "done\n"
+print ("done\n")
 
 output_file_header = '\tTP\tFP\tTN\tFN\tPrecision\tAvg Precision\tRecall\tF1 Score\tBrier Score\tNo Pos Class\tNo Neg Class\n'
 
@@ -631,29 +747,29 @@ test_preds_cal = test_preds_cal.astype(int)
 cm_preds_cal = confusion_matrix(y_test, test_preds_cal)
 
 
-print "Training stats:"
-print "Confusion matrix:"
-print cm_train_preds
-print "precision:"
-print train_precision
-print "Average precision:"
-print train_avg_precision
-print "recall:"
-print train_recall
-print "gmean:"
-print geometric_mean_score(y_train, train_preds, average=None)
-print "gmean (weighted):"
-print geometric_mean_score(y_train, train_preds, average='weighted')
-print "F1 score:"
-print train_f1_score
-print "Brier score:"
-print brier_score_loss(y_train, train_proba)
-print "No pos class:"
-print sample_counts[0]
-print "No neg class:"
-print sample_counts[1]
+print ("Training stats:")
+print ("Confusion matrix:")
+print (cm_train_preds)
+print ("precision:")
+print (train_precision)
+print ("Average precision:")
+print (train_avg_precision)
+print ("recall:")
+print (train_recall)
+print ("gmean:")
+print (geometric_mean_score(y_train, train_preds, average=None))
+print ("gmean (weighted):")
+print (geometric_mean_score(y_train, train_preds, average='weighted'))
+print ("F1 score:")
+print (train_f1_score)
+print ("Brier score:")
+print (brier_score_loss(y_train, train_proba))
+print ("No pos class:")
+print (sample_counts[0])
+print ("No neg class:")
+print (sample_counts[1])
 
-print ""
+print ("")
 
 TN = cm_preds_no_cal[0,0]
 FN = cm_preds_no_cal[1,0]
@@ -672,25 +788,25 @@ test_txt = test_txt + '\t' + str(train_brier_score)
 
 test_txt = test_txt + '\t\t\n'
 
-print "Test stats (no recal):"
-print "Confusion matrix:"
-print cm_preds_no_cal
-print "precision:"
-print test_precision
-print "Average precision:"
-print test_avg_precision
-print "recall:"
-print test_recall
-print "gmean:"
-print geometric_mean_score(y_test, test_preds_no_cal, average=None)
-print "gmean (weighted):"
-print geometric_mean_score(y_test, test_preds_no_cal, average='weighted')
-print "F1 score:"
-print test_f1_score
-print "Brier score:"
-print test_brier_score
+print ("Test stats (no recal):")
+print ("Confusion matrix:")
+print (cm_preds_no_cal)
+print ("precision:")
+print (test_precision)
+print ("Average precision:")
+print (test_avg_precision)
+print ("recall:")
+print (test_recall)
+print ("gmean:")
+print (geometric_mean_score(y_test, test_preds_no_cal, average=None))
+print ("gmean (weighted):")
+print (geometric_mean_score(y_test, test_preds_no_cal, average='weighted'))
+print ("F1 score:")
+print (test_f1_score)
+print ("Brier score:")
+print (test_brier_score)
 
-print ""
+print ("")
 
 TN = cm_preds_cal[0,0]
 FN = cm_preds_cal[1,0]
@@ -710,68 +826,21 @@ test_cal_txt = test_cal_txt + '\t' + str(train_brier_score)
 test_cal_txt = test_cal_txt + '\t\t\n'
 
 
-print "Test stats (recal):"
-print "Confusion matrix:"
-print cm_preds_cal
-print "precision:"
-print test_cal_precision
-print "Average precision:"
-print test_cal_avg_precision
-print "recall:"
-print test_cal_recall
-print "gmean:"
-print geometric_mean_score(y_test, test_preds_cal, average=None)
-print "gmean (weighted):"
-print geometric_mean_score(y_test, test_preds_cal, average='weighted')
-print "F1 score:"
-print test_cal_f1_score
-print "Brier score:"
-print test_cal_brier_score
+print ("Test stats (recal):")
+print ("Confusion matrix:")
+print (cm_preds_cal)
+print ("precision:")
+print (test_cal_precision)
+print ("Average precision:")
+print (test_cal_avg_precision)
+print ("recall:")
+print (test_cal_recall)
+print ("gmean:")
+print (geometric_mean_score(y_test, test_preds_cal, average=None))
+print ("gmean (weighted):")
+print (geometric_mean_score(y_test, test_preds_cal, average='weighted'))
+print ("F1 score:")
+print (test_cal_f1_score)
+print ("Brier score:")
+print (test_cal_brier_score)
 
-
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
