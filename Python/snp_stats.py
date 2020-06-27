@@ -1,4 +1,5 @@
-#!/home/eliot/anaconda2/bin/python
+#!/path/to/anaconda3/bin/python
+
 # -*- coding: utf-8 -*-
 """
 Created on Fri Apr 14 10:54:33 2017
@@ -146,6 +147,7 @@ print("Recall: " + str(after_recall))
 prec_pct_change = (float(after_precision) / float(before_precision) - 1) * 100.0
 recall_pct_change = (float(after_recall) / float(before_recall) - 1) * 100.0
 
+#this just appends each line to a file called stats.tab. primitive, I know ....
 with open(top_level + "/models/stats.tab", "a") as f:
     
     l = [str(nr_tp_gt_20), str(nr_fp_gt_20), str(nr_total_tp), str(nr_total_fp), str(before_fn_calls), str(r_tp_gt_20), str(r_fp_gt_20), str(r_total_tp), str(r_total_fp), str(after_fn_calls)]
