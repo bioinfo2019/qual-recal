@@ -6,6 +6,18 @@ BASE_DIR=/your/top/level/path
 LD_LIBRARY_PATH=$BASE_DIR/misc/bamlib
 export LD_LIBRARY_PATH
 
+# Models codes for the -ml-model paramter to ModelTraining.py and ModelPredict.py are listed below.
+# The meaning of each can be found in our paper:
+
+# RULRS
+# RULSVMS
+# RULR
+# RUSVM
+# DTBG
+# RUBST
+# ADB
+# XGB
+
 # general paramters
 
 # Comment/uncomment these depending on which genome is being used
