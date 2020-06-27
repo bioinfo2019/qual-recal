@@ -82,12 +82,17 @@ NRMAP_RECALBAM=$SAMPLE_ID.recal.bam
 NRMAP_SCORESFILE=$BASE_DIR/models/10_scores.tab # Not used for anything now, but needs to be left in
 
 SAMPLED_FEATS_FILE=$BASE_DIR/tomato_sampled_feats.tab
-FULL_FEATS_FILE=$VARSIM_PATH/$FEATURES_FILE
 
 ############# DO NOT CHANGE ANYTHING BELOW THIS LINE!##################
 
+# predict misaligned reads and write out new quality scores file
+
+cd $BASE_DIR/PythonProgs
+./ModelPredict.py --base-dir $BASE_DIR --ml-model ADB --feats-file $FEATURES_FILE --features MAPQ,PAIR_ALIGNMENT_TYPE,SECONDARY_ALIGNMENT_SCORE,N_LOW_QUAL_BASES,ALIGNMENT_SCORES_DIFF,CLASS
+cd $VARSIM_PATH
+
 # recalibrate bam file
-$NRMAP_PATH/nrmap recalbam --bamfilein $NRMAP_INBAM --bamfileout $TMP_DIR/$NRMAP_RECALBAM --qualsfile $BASE_DIR/models/$PREFIX.scores.tab
+$NRMAP_PATH/nrmap recalbam --bamfilein $NRMAP_INBAM --bamfileout $TMP_DIR/$NRMAP_RECALBAM --qualsfile $BASE_DIR/models/scores.tab
   
 samtools sort -o $VARSIM_PATH/alignments/$NRMAP_RECALBAM -O bam -@ 12 $TMP_DIR/$NRMAP_RECALBAM
 rm $TMP_DIR/$NRMAP_RECALBAM
